@@ -828,9 +828,78 @@ function playSound(type) {
 }
 
 // ===========================
+// CAMERA MOVEMENT
+// ===========================
+const moveSpeed = 0.1;
+const rotateSpeed = 0.05;
+
+function moveCamera(direction) {
+    const oldZ = camera.position.z;
+
+    switch(direction) {
+        case 'forward':
+            camera.position.z += moveSpeed;
+            break;
+        case 'backward':
+            camera.position.z -= moveSpeed;
+            break;
+        case 'left':
+            camera.position.x -= moveSpeed;
+            break;
+        case 'right':
+            camera.position.x += moveSpeed;
+            break;
+        case 'rotateLeft':
+            camera.rotation.y += rotateSpeed;
+            break;
+        case 'rotateRight':
+            camera.rotation.y -= rotateSpeed;
+            break;
+    }
+
+    console.log(`Camera position: x=${camera.position.x.toFixed(2)}, y=${camera.position.y.toFixed(2)}, z=${camera.position.z.toFixed(2)}, rotation.y=${camera.rotation.y.toFixed(2)}`);
+}
+
+// ===========================
 // INPUT HANDLING
 // ===========================
 document.addEventListener('keydown', (event) => {
+    // Camera movement (works always, even during instructions)
+    switch(event.key) {
+        case 'ArrowUp':
+            event.preventDefault();
+            moveCamera('forward');
+            return;
+        case 'ArrowDown':
+            event.preventDefault();
+            moveCamera('backward');
+            return;
+        case 'ArrowLeft':
+            event.preventDefault();
+            moveCamera('rotateLeft');
+            return;
+        case 'ArrowRight':
+            event.preventDefault();
+            moveCamera('rotateRight');
+            return;
+        case 'w':
+        case 'W':
+            moveCamera('forward');
+            return;
+        case 's':
+        case 'S':
+            moveCamera('backward');
+            return;
+        case 'a':
+        case 'A':
+            moveCamera('left');
+            return;
+        case 'd':
+        case 'D':
+            moveCamera('right');
+            return;
+    }
+
     if (!gameState.isGameActive) return;
 
     switch(event.key.toLowerCase()) {
