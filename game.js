@@ -39,14 +39,14 @@ function initThreeJS() {
     scene.background = new THREE.Color(0x0a0a0a);
     scene.fog = new THREE.Fog(0x0a0a0a, 10, 30);
 
-    // Camera (first-person view)
+    // Camera (first-person view) - positioned close to door
     camera = new THREE.PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
         0.1,
         1000
     );
-    camera.position.set(0, 1.6, -3); // Eye level, looking at door
+    camera.position.set(0, 1.6, 5); // Eye level, very close to door for peephole view
 
     // Renderer
     const canvas = document.getElementById('game-canvas');
@@ -58,9 +58,10 @@ function initThreeJS() {
     ambientLight = new THREE.AmbientLight(0x404040, 0.5);
     scene.add(ambientLight);
 
-    // Hallway light (controlled by switch)
-    hallwayLight = new THREE.PointLight(0xffffcc, 0, 8);
-    hallwayLight.position.set(0, 2, 5);
+    // Hallway light (controlled by switch) - positioned outside door
+    hallwayLight = new THREE.PointLight(0xffffcc, 0, 15);
+    hallwayLight.position.set(0, 2.5, 9);
+    hallwayLight.castShadow = true;
     scene.add(hallwayLight);
 
     // Room light
@@ -71,6 +72,8 @@ function initThreeJS() {
     createRoom();
     createDoor();
     createPeephole();
+    createLightSwitch();
+    createHallway();
 
     // Handle window resize
     window.addEventListener('resize', onWindowResize);
@@ -177,17 +180,111 @@ function createDoor() {
     doorPanel.name = 'doorPanel';
     door.add(doorPanel);
 
-    // Peephole circle on door
-    const peepholeRingGeometry = new THREE.CircleGeometry(0.08, 16);
+    // Peephole hole on door (dark circle showing the hole)
+    const peepholeHoleGeometry = new THREE.CircleGeometry(0.06, 32);
+    const peepholeHoleMaterial = new THREE.MeshBasicMaterial({
+        color: 0x000000
+    });
+    const peepholeHole = new THREE.Mesh(peepholeHoleGeometry, peepholeHoleMaterial);
+    peepholeHole.position.set(0, 1.6, 7.21);
+    peepholeHole.name = 'peepholeHole';
+    door.add(peepholeHole);
+
+    // Peephole metal ring around hole
+    const peepholeRingGeometry = new THREE.RingGeometry(0.06, 0.09, 32);
     const peepholeRingMaterial = new THREE.MeshStandardMaterial({
-        color: 0x888888,
-        metalness: 0.8
+        color: 0xaaaaaa,
+        metalness: 0.9,
+        roughness: 0.2
     });
     const peepholeRing = new THREE.Mesh(peepholeRingGeometry, peepholeRingMaterial);
-    peepholeRing.position.set(0, 1.6, 7.21);
+    peepholeRing.position.set(0, 1.6, 7.22);
     door.add(peepholeRing);
 
     scene.add(door);
+}
+
+// ===========================
+// LIGHT SWITCH
+// ===========================
+function createLightSwitch() {
+    const switchGroup = new THREE.Group();
+
+    // Switch plate (on the wall next to door)
+    const plateGeometry = new THREE.BoxGeometry(0.15, 0.25, 0.02);
+    const plateMaterial = new THREE.MeshStandardMaterial({
+        color: 0xeeeeee,
+        roughness: 0.5
+    });
+    const plate = new THREE.Mesh(plateGeometry, plateMaterial);
+    switchGroup.add(plate);
+
+    // Switch toggle
+    const toggleGeometry = new THREE.BoxGeometry(0.08, 0.12, 0.03);
+    const toggleMaterial = new THREE.MeshStandardMaterial({
+        color: 0xcccccc,
+        roughness: 0.4
+    });
+    const toggle = new THREE.Mesh(toggleGeometry, toggleMaterial);
+    toggle.position.z = 0.025;
+    toggle.name = 'lightSwitchToggle';
+    switchGroup.add(toggle);
+
+    // Position switch on wall to the right of door
+    switchGroup.position.set(1.5, 1.5, 6.8);
+    switchGroup.rotation.y = 0;
+
+    scene.add(switchGroup);
+}
+
+// ===========================
+// HALLWAY (Outside the door)
+// ===========================
+function createHallway() {
+    const hallwayGroup = new THREE.Group();
+
+    // Hallway floor (visible through peephole)
+    const hallwayFloorGeometry = new THREE.PlaneGeometry(5, 8);
+    const hallwayFloorMaterial = new THREE.MeshStandardMaterial({
+        color: 0x2a2520,
+        roughness: 0.9
+    });
+    const hallwayFloor = new THREE.Mesh(hallwayFloorGeometry, hallwayFloorMaterial);
+    hallwayFloor.rotation.x = -Math.PI / 2;
+    hallwayFloor.position.set(0, 0, 10);
+    hallwayFloor.receiveShadow = true;
+    hallwayGroup.add(hallwayFloor);
+
+    // Hallway ceiling
+    const hallwayCeiling = new THREE.Mesh(hallwayFloorGeometry, hallwayFloorMaterial);
+    hallwayCeiling.rotation.x = Math.PI / 2;
+    hallwayCeiling.position.set(0, 3, 10);
+    hallwayGroup.add(hallwayCeiling);
+
+    // Hallway back wall
+    const hallwayBackWallGeometry = new THREE.PlaneGeometry(5, 3);
+    const hallwayWallMaterial = new THREE.MeshStandardMaterial({
+        color: 0x3a3530,
+        roughness: 0.9
+    });
+    const hallwayBackWall = new THREE.Mesh(hallwayBackWallGeometry, hallwayWallMaterial);
+    hallwayBackWall.position.set(0, 1.5, 14);
+    hallwayGroup.add(hallwayBackWall);
+
+    // Hallway left wall
+    const hallwaySideWallGeometry = new THREE.PlaneGeometry(8, 3);
+    const hallwayLeftWall = new THREE.Mesh(hallwaySideWallGeometry, hallwayWallMaterial);
+    hallwayLeftWall.rotation.y = Math.PI / 2;
+    hallwayLeftWall.position.set(-2.5, 1.5, 10);
+    hallwayGroup.add(hallwayLeftWall);
+
+    // Hallway right wall
+    const hallwayRightWall = new THREE.Mesh(hallwaySideWallGeometry, hallwayWallMaterial);
+    hallwayRightWall.rotation.y = -Math.PI / 2;
+    hallwayRightWall.position.set(2.5, 1.5, 10);
+    hallwayGroup.add(hallwayRightWall);
+
+    scene.add(hallwayGroup);
 }
 
 // ===========================
@@ -196,16 +293,30 @@ function createDoor() {
 function createPeephole() {
     peephole = new THREE.Group();
 
-    // Peephole "shutter" effect - black circle that covers view
+    // Peephole "shutter" cover - black circle that blocks view when closed
     const shutterGeometry = new THREE.CircleGeometry(0.5, 32);
     const shutterMaterial = new THREE.MeshBasicMaterial({
         color: 0x000000,
         side: THREE.DoubleSide
     });
     const shutter = new THREE.Mesh(shutterGeometry, shutterMaterial);
-    shutter.position.set(0, 1.6, 6.9);
+    shutter.position.set(0, 1.6, 7.15); // Right in front of peephole hole
     shutter.name = 'peepholeShutter';
     peephole.add(shutter);
+
+    // Vignette effect when peephole is open (circular frame)
+    const vignetteGeometry = new THREE.RingGeometry(0.3, 2.0, 64);
+    const vignetteMaterial = new THREE.MeshBasicMaterial({
+        color: 0x000000,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.95
+    });
+    const vignette = new THREE.Mesh(vignetteGeometry, vignetteMaterial);
+    vignette.position.set(0, 1.6, 5.2); // Close to camera for vignette effect
+    vignette.visible = false;
+    vignette.name = 'peepholeVignette';
+    peephole.add(vignette);
 
     scene.add(peephole);
 }
@@ -216,9 +327,25 @@ function togglePeephole() {
     gameState.peepholeOpen = !gameState.peepholeOpen;
 
     const shutter = scene.getObjectByName('peepholeShutter');
+    const vignette = scene.getObjectByName('peepholeVignette');
+
     if (shutter) {
         shutter.visible = !gameState.peepholeOpen;
     }
+
+    if (vignette) {
+        vignette.visible = gameState.peepholeOpen;
+    }
+
+    // Zoom camera slightly when peephole opens for better view
+    if (gameState.peepholeOpen) {
+        camera.position.z = 6.5; // Move closer to door
+        camera.fov = 60; // Narrow FOV for peephole effect
+    } else {
+        camera.position.z = 5; // Back to normal position
+        camera.fov = 75; // Normal FOV
+    }
+    camera.updateProjectionMatrix();
 
     updatePeepholeUI();
     playSound('peephole');
@@ -242,8 +369,17 @@ function toggleLight() {
 
     gameState.lightOn = !gameState.lightOn;
 
-    // Update hallway light
-    hallwayLight.intensity = gameState.lightOn ? 1.5 : 0;
+    // Update hallway light intensity - much brighter when on!
+    hallwayLight.intensity = gameState.lightOn ? 3.0 : 0;
+
+    // Visual feedback: move the light switch toggle
+    const toggle = scene.getObjectByName('lightSwitchToggle');
+    if (toggle) {
+        // Rotate toggle up when on, down when off
+        toggle.rotation.z = gameState.lightOn ? 0.3 : -0.3;
+        // Change toggle color to show state
+        toggle.material.color.setHex(gameState.lightOn ? 0xffff99 : 0xcccccc);
+    }
 
     updateLightUI();
     playSound('switch');
@@ -265,66 +401,76 @@ function createVisitor(type) {
     visitor = new THREE.Group();
 
     if (type === CharacterType.STALKER) {
-        // Stalker: Black figure with red eyes
-        const bodyGeometry = new THREE.BoxGeometry(0.8, 1.8, 0.3);
-        const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x0a0a0a });
+        // Stalker: Black figure with red eyes (larger and more menacing)
+        const bodyGeometry = new THREE.BoxGeometry(1.0, 2.0, 0.4);
+        const bodyMaterial = new THREE.MeshStandardMaterial({
+            color: 0x050505,
+            roughness: 0.1,
+            metalness: 0.1
+        });
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.position.set(0, 1.0, 0);
+        visitor.add(body);
+
+        // Head (more rounded)
+        const headGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+        const head = new THREE.Mesh(headGeometry, bodyMaterial);
+        head.position.set(0, 2.15, 0);
+        visitor.add(head);
+
+        // Red glowing eyes (bigger and brighter)
+        const eyeGeometry = new THREE.SphereGeometry(0.08, 16, 16);
+        const eyeMaterial = new THREE.MeshBasicMaterial({
+            color: 0xff0000,
+            emissive: 0xff0000,
+            emissiveIntensity: 3
+        });
+
+        const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        leftEye.position.set(-0.12, 2.2, 0.25);
+        visitor.add(leftEye);
+
+        const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        rightEye.position.set(0.12, 2.2, 0.25);
+        visitor.add(rightEye);
+
+    } else {
+        // Dave and Mimic: Human-like figure (bigger and more visible)
+        const bodyGeometry = new THREE.BoxGeometry(0.8, 1.8, 0.4);
+        const bodyMaterial = new THREE.MeshStandardMaterial({
+            color: 0x4a6a8a,
+            roughness: 0.7
+        });
         const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
         body.position.set(0, 0.9, 0);
         visitor.add(body);
 
-        // Head
-        const headGeometry = new THREE.SphereGeometry(0.25, 16, 16);
-        const head = new THREE.Mesh(headGeometry, bodyMaterial);
-        head.position.set(0, 1.9, 0);
-        visitor.add(head);
-
-        // Red eyes
-        const eyeGeometry = new THREE.SphereGeometry(0.05, 8, 8);
-        const eyeMaterial = new THREE.MeshBasicMaterial({
-            color: 0xff0000,
-            emissive: 0xff0000,
-            emissiveIntensity: 2
+        // Head (bigger)
+        const headGeometry = new THREE.BoxGeometry(0.45, 0.45, 0.4);
+        const headMaterial = new THREE.MeshStandardMaterial({
+            color: 0xdaa588,
+            roughness: 0.8
         });
-
-        const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        leftEye.position.set(-0.1, 1.95, 0.2);
-        visitor.add(leftEye);
-
-        const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        rightEye.position.set(0.1, 1.95, 0.2);
-        visitor.add(rightEye);
-
-    } else {
-        // Dave and Mimic: Human-like figure
-        const bodyGeometry = new THREE.BoxGeometry(0.6, 1.6, 0.3);
-        const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x4a6a8a });
-        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-        body.position.set(0, 0.8, 0);
-        visitor.add(body);
-
-        // Head
-        const headGeometry = new THREE.BoxGeometry(0.35, 0.35, 0.3);
-        const headMaterial = new THREE.MeshStandardMaterial({ color: 0xdaa588 });
         const head = new THREE.Mesh(headGeometry, headMaterial);
-        head.position.set(0, 1.75, 0);
+        head.position.set(0, 2.0, 0);
         visitor.add(head);
 
-        // Eyes
+        // Eyes (much bigger and more visible!)
         const eyeColor = type === CharacterType.MIMIC ? 0xff0000 : 0x2a2a2a;
-        const eyeGeometry = new THREE.SphereGeometry(0.04, 8, 8);
+        const eyeGeometry = new THREE.SphereGeometry(0.07, 16, 16);
         const eyeMaterial = new THREE.MeshBasicMaterial({
             color: eyeColor,
             emissive: type === CharacterType.MIMIC ? 0xff0000 : 0x000000,
-            emissiveIntensity: type === CharacterType.MIMIC ? 1.5 : 0
+            emissiveIntensity: type === CharacterType.MIMIC ? 2.5 : 0
         });
 
         const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        leftEye.position.set(-0.08, 1.8, 0.15);
+        leftEye.position.set(-0.12, 2.05, 0.2);
         leftEye.name = 'leftEye';
         visitor.add(leftEye);
 
         const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        rightEye.position.set(0.08, 1.8, 0.15);
+        rightEye.position.set(0.12, 2.05, 0.2);
         rightEye.name = 'rightEye';
         visitor.add(rightEye);
 
@@ -335,7 +481,8 @@ function createVisitor(type) {
         }
     }
 
-    visitor.position.set(0, 0, 7.5);
+    // Position visitor OUTSIDE the door in the hallway (visible through peephole)
+    visitor.position.set(0, 0, 8.5);
     visitor.userData.type = type;
     scene.add(visitor);
 

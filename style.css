@@ -215,3 +215,39 @@ body {
 .instructions-content::-webkit-scrollbar-thumb:hover {
     background: #cc0000;
 }
+
+/* Controls Reminder */
+#controls-reminder {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 12px 20px;
+    display: flex;
+    gap: 25px;
+    pointer-events: none;
+}
+
+.control-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.key {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-weight: bold;
+    font-size: 12px;
+    color: #ffff00;
+    min-width: 50px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}

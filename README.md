@@ -113,15 +113,68 @@ Simply open `index.html` in your web browser (double-click the file).
 2. Right-click `index.html`
 3. Select "Open with Live Server"
 
+## 🌐 Deployment Options
+
+This game is ready to deploy to any static hosting platform. Here are the recommended options:
+
+### GitHub Pages (Recommended - Automated)
+
+**Auto-deployment is already configured!** The game will automatically deploy when you push to the repository.
+
+1. Go to your repository settings
+2. Navigate to **Settings > Pages**
+3. Under "Build and deployment":
+   - Source: Select **GitHub Actions**
+4. Push your code to the branch
+5. GitHub Actions will automatically deploy your game
+6. Your game will be live at: `https://<username>.github.io/CarMcB-Knock/`
+
+The workflow file is located at `.github/workflows/deploy.yml` and triggers on every push.
+
+### Netlify (Alternative - One-Click Deploy)
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/rolandbough/CarMcB-Knock)
+
+Or manually:
+1. Go to [netlify.com](https://netlify.com)
+2. Click "Add new site" > "Import an existing project"
+3. Connect your GitHub repository
+4. Netlify will auto-detect the `netlify.toml` configuration
+5. Click "Deploy site"
+6. Your game will be live in seconds!
+
+### Vercel (Alternative)
+
+1. Go to [vercel.com](https://vercel.com)
+2. Click "New Project"
+3. Import your GitHub repository
+4. Vercel will auto-detect the configuration
+5. Click "Deploy"
+
+### Other Static Hosts
+
+The game also works on:
+- **Cloudflare Pages**
+- **Render**
+- **Surge.sh**
+- Any static hosting service
+
+Simply point the hosting service to the repository root - no build process needed!
+
 ## 📁 Project Structure
 
 ```
 CarMcB-Knock/
-├── index.html          # Main HTML file
-├── style.css           # Game styling
-├── game.js             # Complete game logic
-├── README.md           # This file
-└── GAME_PLAN.md        # Development plan and roadmap
+├── .github/
+│   └── workflows/
+│       └── deploy.yml      # GitHub Actions auto-deployment
+├── index.html              # Main HTML file
+├── style.css               # Game styling
+├── game.js                 # Complete game logic
+├── netlify.toml            # Netlify configuration
+├── vercel.json             # Vercel configuration
+├── README.md               # This file
+└── GAME_PLAN.md            # Development plan and roadmap
 ```
 
 ## 🎨 Features
