@@ -59,8 +59,8 @@ function initThreeJS() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
 
-    // Lights
-    ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+    // Lights - MUCH brighter so you can actually see!
+    ambientLight = new THREE.AmbientLight(0x808080, 1.5);
     scene.add(ambientLight);
 
     // Hallway light (controlled by switch) - positioned outside door
@@ -69,8 +69,8 @@ function initThreeJS() {
     hallwayLight.castShadow = true;
     scene.add(hallwayLight);
 
-    // Room light
-    const roomLight = new THREE.PointLight(0xffddaa, 0.3, 15);
+    // Room light - much brighter
+    const roomLight = new THREE.PointLight(0xffddaa, 1.5, 15);
     roomLight.position.set(0, 2.5, -5);
     scene.add(roomLight);
 
@@ -105,10 +105,10 @@ function onWindowResize() {
 function createRoom() {
     const roomGroup = new THREE.Group();
 
-    // Floor
+    // Floor - lighter for visibility
     const floorGeometry = new THREE.PlaneGeometry(10, 15);
     const floorMaterial = new THREE.MeshStandardMaterial({
-        color: 0x3a2f2f,
+        color: 0x5a4f4f,
         roughness: 0.8
     });
     const floor = new THREE.Mesh(floorGeometry, floorMaterial);
@@ -122,10 +122,10 @@ function createRoom() {
     ceiling.position.y = 3;
     roomGroup.add(ceiling);
 
-    // Left wall
+    // Left wall - lighter for visibility
     const wallGeometry = new THREE.PlaneGeometry(15, 3);
     const wallMaterial = new THREE.MeshStandardMaterial({
-        color: 0x4a3f3f,
+        color: 0x6a5f5f,
         roughness: 0.9
     });
     const leftWall = new THREE.Mesh(wallGeometry, wallMaterial);
@@ -179,16 +179,16 @@ function createFurniture(roomGroup) {
 function createDoor() {
     door = new THREE.Group();
 
-    // Door frame
+    // Door frame - lighter color for visibility
     const frameGeometry = new THREE.BoxGeometry(2.2, 2.4, 0.3);
-    const frameMaterial = new THREE.MeshStandardMaterial({ color: 0x2a1a1a });
+    const frameMaterial = new THREE.MeshStandardMaterial({ color: 0x4a3a3a });
     const frame = new THREE.Mesh(frameGeometry, frameMaterial);
     frame.position.set(0, 1.2, 7.35);
     door.add(frame);
 
-    // Door itself
+    // Door itself - lighter color for visibility
     const doorGeometry = new THREE.BoxGeometry(2, 2.2, 0.2);
-    const doorMaterial = new THREE.MeshStandardMaterial({ color: 0x4a2a2a });
+    const doorMaterial = new THREE.MeshStandardMaterial({ color: 0x6a4a4a });
     const doorPanel = new THREE.Mesh(doorGeometry, doorMaterial);
     doorPanel.position.set(0, 1.1, 7.2);
     doorPanel.name = 'doorPanel';
@@ -316,6 +316,7 @@ function createPeephole() {
     const shutter = new THREE.Mesh(shutterGeometry, shutterMaterial);
     shutter.position.set(0, 1.6, 0.5); // Close to camera when in room
     shutter.name = 'peepholeShutter';
+    shutter.visible = false; // Hidden until game starts (don't block view!)
     peephole.add(shutter);
 
     // Vignette effect when peephole is open (circular frame)
@@ -665,6 +666,10 @@ function startGame() {
     updateEncounterUI();
     updateLightUI();
     updatePeepholeUI();
+
+    // Show the peephole shutter now that game is active
+    const shutter = scene.getObjectByName('peepholeShutter');
+    if (shutter) shutter.visible = true;
 
     // Spawn first visitor
     setTimeout(() => {
