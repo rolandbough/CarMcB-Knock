@@ -1,4 +1,4 @@
-# NOT - Horror Game
+# KNOCK - Horror Game
 
 A first-person horror game where you must identify and manage visitors at your door using a peephole and light switch mechanic.
 
@@ -224,7 +224,7 @@ This project is part of a game development learning exercise.
 
 ---
 
-**Working Title**: NOT
+**Working Title**: KNOCK
 **Version**: 1.0.0 (MVP)
 **Last Updated**: December 2024
 
