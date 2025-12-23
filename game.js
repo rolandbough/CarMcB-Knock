@@ -34,10 +34,14 @@ let room, door, peephole, visitor;
 let ambientLight, hallwayLight;
 
 function initThreeJS() {
+    console.log('Initializing Three.js...');
+    console.log('THREE available:', typeof THREE !== 'undefined');
+
     // Scene
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0a0a);
     scene.fog = new THREE.Fog(0x0a0a0a, 10, 30);
+    console.log('Scene created');
 
     // Camera (first-person view) - positioned close to door
     camera = new THREE.PerspectiveCamera(
@@ -47,6 +51,7 @@ function initThreeJS() {
         1000
     );
     camera.position.set(0, 1.6, 5); // Eye level, very close to door for peephole view
+    camera.lookAt(0, 1.6, 10); // Look towards the door and hallway
 
     // Renderer
     const canvas = document.getElementById('game-canvas');
@@ -69,14 +74,23 @@ function initThreeJS() {
     roomLight.position.set(0, 2.5, -5);
     scene.add(roomLight);
 
+    console.log('Creating room elements...');
     createRoom();
+    console.log('Room created');
     createDoor();
+    console.log('Door created');
     createPeephole();
+    console.log('Peephole created');
     createLightSwitch();
+    console.log('Light switch created');
     createHallway();
+    console.log('Hallway created');
+    console.log('Scene objects:', scene.children.length);
 
     // Handle window resize
     window.addEventListener('resize', onWindowResize);
+
+    console.log('Three.js initialization complete!');
 }
 
 function onWindowResize() {
@@ -345,6 +359,7 @@ function togglePeephole() {
         camera.position.z = 5; // Back to normal position
         camera.fov = 75; // Normal FOV
     }
+    camera.lookAt(0, 1.6, 10); // Keep looking towards door
     camera.updateProjectionMatrix();
 
     updatePeepholeUI();
@@ -871,5 +886,8 @@ function animate() {
 // ===========================
 // INITIALIZATION
 // ===========================
+console.log('Starting game initialization...');
 initThreeJS();
+console.log('Starting animation loop...');
 animate();
+console.log('Game fully initialized and running!');
