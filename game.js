@@ -34,10 +34,14 @@ let room, door, peephole, visitor;
 let ambientLight, hallwayLight;
 
 function initThreeJS() {
+    console.log('Initializing Three.js...');
+    console.log('THREE available:', typeof THREE !== 'undefined');
+
     // Scene
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0a0a);
     scene.fog = new THREE.Fog(0x0a0a0a, 10, 30);
+    console.log('Scene created');
 
     // Camera (first-person view) - positioned close to door
     camera = new THREE.PerspectiveCamera(
@@ -46,7 +50,8 @@ function initThreeJS() {
         0.1,
         1000
     );
-    camera.position.set(0, 1.6, 5); // Eye level, very close to door for peephole view
+    camera.position.set(0, 1.6, 0); // Eye level, inside the room
+    camera.lookAt(0, 1.6, 7.2); // Look directly at the door
 
     // Renderer
     const canvas = document.getElementById('game-canvas');
@@ -69,14 +74,23 @@ function initThreeJS() {
     roomLight.position.set(0, 2.5, -5);
     scene.add(roomLight);
 
+    console.log('Creating room elements...');
     createRoom();
+    console.log('Room created');
     createDoor();
+    console.log('Door created');
     createPeephole();
+    console.log('Peephole created');
     createLightSwitch();
+    console.log('Light switch created');
     createHallway();
+    console.log('Hallway created');
+    console.log('Scene objects:', scene.children.length);
 
     // Handle window resize
     window.addEventListener('resize', onWindowResize);
+
+    console.log('Three.js initialization complete!');
 }
 
 function onWindowResize() {
@@ -294,26 +308,26 @@ function createPeephole() {
     peephole = new THREE.Group();
 
     // Peephole "shutter" cover - black circle that blocks view when closed
-    const shutterGeometry = new THREE.CircleGeometry(0.5, 32);
+    const shutterGeometry = new THREE.CircleGeometry(1.5, 32);
     const shutterMaterial = new THREE.MeshBasicMaterial({
         color: 0x000000,
         side: THREE.DoubleSide
     });
     const shutter = new THREE.Mesh(shutterGeometry, shutterMaterial);
-    shutter.position.set(0, 1.6, 7.15); // Right in front of peephole hole
+    shutter.position.set(0, 1.6, 0.5); // Close to camera when in room
     shutter.name = 'peepholeShutter';
     peephole.add(shutter);
 
     // Vignette effect when peephole is open (circular frame)
-    const vignetteGeometry = new THREE.RingGeometry(0.3, 2.0, 64);
+    const vignetteGeometry = new THREE.RingGeometry(0.4, 3.0, 64);
     const vignetteMaterial = new THREE.MeshBasicMaterial({
         color: 0x000000,
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: 0.95
+        opacity: 0.98
     });
     const vignette = new THREE.Mesh(vignetteGeometry, vignetteMaterial);
-    vignette.position.set(0, 1.6, 5.2); // Close to camera for vignette effect
+    vignette.position.set(0, 1.6, 7.0); // In front of face when looking through peephole
     vignette.visible = false;
     vignette.name = 'peepholeVignette';
     peephole.add(vignette);
@@ -337,13 +351,15 @@ function togglePeephole() {
         vignette.visible = gameState.peepholeOpen;
     }
 
-    // Zoom camera slightly when peephole opens for better view
+    // Zoom camera significantly when peephole opens for close-up view
     if (gameState.peepholeOpen) {
-        camera.position.z = 6.5; // Move closer to door
-        camera.fov = 60; // Narrow FOV for peephole effect
+        camera.position.z = 6.9; // Move very close to peephole
+        camera.fov = 50; // Narrow FOV for peephole effect
+        camera.lookAt(0, 1.6, 8.5); // Look at character position through peephole
     } else {
-        camera.position.z = 5; // Back to normal position
+        camera.position.z = 0; // Back to room position
         camera.fov = 75; // Normal FOV
+        camera.lookAt(0, 1.6, 7.2); // Look at door
     }
     camera.updateProjectionMatrix();
 
@@ -871,5 +887,8 @@ function animate() {
 // ===========================
 // INITIALIZATION
 // ===========================
+console.log('Starting game initialization...');
 initThreeJS();
+console.log('Starting animation loop...');
 animate();
+console.log('Game fully initialized and running!');
