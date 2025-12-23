@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KNOCK - Horror Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Game canvas will be inserted here -->
+        <canvas id="game-canvas"></canvas>
+
+        <!-- UI Overlay -->
+        <div id="ui-overlay">
+            <!-- Instructions -->
+            <div id="instructions" class="ui-panel">
+                <h1>KNOCK</h1>
+                <div class="instructions-content">
+                    <h2>How to Play</h2>
+                    <p><strong>You are in your apartment. Someone is knocking at your door.</strong></p>
+                    <br>
+                    <h3>Characters:</h3>
+                    <ul>
+                        <li><strong>Dave</strong> - Your neighbor who lost his keys. Let him in within 10 seconds or you die. (Safe to let in)</li>
+                        <li><strong>Mimic</strong> - Looks like Dave but has RED EYES. Only visible with light ON. DO NOT let in.</li>
+                        <li><strong>Stalker</strong> - Black figure with red eyes. Will kill you if you view it with light ON.</li>
+                    </ul>
+                    <br>
+                    <h3>Controls:</h3>
+                    <ul>
+                        <li><strong>L Key</strong> - Toggle light switch (set BEFORE opening peephole)</li>
+                        <li><strong>SPACE</strong> - Open/Close peephole</li>
+                        <li><strong>E Key</strong> - Open door (to let visitor in)</li>
+                    </ul>
+                    <br>
+                    <p><strong>IMPORTANT:</strong> You must set the light status BEFORE opening the peephole!</p>
+                    <p><strong>Goal:</strong> Survive 10 encounters.</p>
+                    <br>
+                    <button id="start-button" class="game-button">START GAME</button>
+                </div>
+            </div>
+
+            <!-- Game HUD -->
+            <div id="hud" class="hidden">
+                <div id="encounter-counter">Encounter: <span id="encounter-num">1</span>/10</div>
+                <div id="light-status">Light: <span id="light-state">OFF</span></div>
+                <div id="timer-display" class="hidden">
+                    <div class="timer-warning">DAVE IS WAITING!</div>
+                    <div class="timer-value"><span id="timer-value">10</span>s</div>
+                </div>
+                <div id="peephole-status">Peephole: <span id="peephole-state">CLOSED</span></div>
+                <div id="notification"></div>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="game-over" class="ui-panel hidden">
+                <h1 id="game-over-title">YOU DIED</h1>
+                <p id="game-over-message"></p>
+                <button id="restart-button" class="game-button">RESTART</button>
+            </div>
+
+            <!-- Victory Screen -->
+            <div id="victory" class="ui-panel hidden">
+                <h1>YOU SURVIVED</h1>
+                <p>You successfully survived all 10 encounters!</p>
+                <p>Your instincts kept you alive.</p>
+                <button id="victory-restart-button" class="game-button">PLAY AGAIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Game Script -->
+    <script src="game.js"></script>
+</body>
+</html>
